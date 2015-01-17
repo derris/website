@@ -1,11 +1,10 @@
 from django.db import models
 from django.db.models import DO_NOTHING
 import datetime
-
-
 # Create your models here.
 
 BoolCharacter=(('Y','是'),('N','否'))
+
 class BaseModel(models.Model):
     ''''''
     rec_name = models.IntegerField('创建人员')
