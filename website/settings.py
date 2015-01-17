@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #'DjangoUeditor',
     'App',
 )
 
@@ -81,8 +82,10 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
-DOWNLOAD_URL = '/static/download/'
+
 STATIC_PATH = BASE_DIR + "/App/static"
+
+MEDIA_ROOT = BASE_DIR + "/App/media"
 
 DOWNLOAD_PATH = BASE_DIR + "/App/static/download/"
 

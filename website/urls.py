@@ -7,4 +7,5 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^App/', include(admin.site.urls)),
+    url(r'^ueditor/',include('DjangoUeditor.urls')),
 )
