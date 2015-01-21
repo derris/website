@@ -85,8 +85,8 @@ USE_TZ = False
 STATIC_URL = '/static/'
 
 STATIC_PATH = BASE_DIR + "/App/static"
-
-MEDIA_ROOT = BASE_DIR + "/App/media"
+MEDIA_URL = '/static/media/'
+MEDIA_ROOT = BASE_DIR + "/App/static/media"
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),

@@ -6,7 +6,8 @@ import os
 import json
 from django.views.decorators.csrf import csrf_exempt
 import datetime,random
-import urllib
+from urllib.parse import urljoin
+from urllib.request import urlopen
 
 def get_path_format_vars():
     return {
@@ -110,7 +111,7 @@ def get_files(root_path,cur_path, allow_types=[]):
             is_allow_list= (len(allow_types)==0) or (ext in allow_types)
             if is_allow_list:
                 files.append({
-                    "url":urllib.basejoin(USettings.gSettings.MEDIA_URL ,os.path.join(os.path.relpath(cur_path,root_path),item).replace("\\","/" )),
+                    "url":urljoin(USettings.gSettings.MEDIA_URL ,os.path.join(os.path.relpath(cur_path,root_path),item).replace("\\","/" )),
                     "mtime":os.path.getmtime(item_fullname)
                 })
 
@@ -153,7 +154,7 @@ def UploadFile(request):
         "uploadimage":"imageAllowFiles",
         "uploadvideo":"videoAllowFiles"
     }
-    if upload_allow_type.has_key(action):
+    if action in upload_allow_type:
         allow_type= list(request.GET.get(upload_allow_type[action],USettings.UEditorUploadSettings.get(upload_allow_type[action],"")))
         if not upload_original_ext  in allow_type:
             state=u"服务器不允许上传%s类型的文件。" % upload_original_ext
@@ -168,9 +169,9 @@ def UploadFile(request):
     max_size=int(request.GET.get(upload_max_size[action],USettings.UEditorUploadSettings.get(upload_max_size[action],0)))
     if  max_size!=0:
         from App.ueditor.utils import FileSize
-        MF=FileSize(max_size)
-        if upload_file_size>MF.size:
-            state=u"上传文件大小不允许超过%s。" % MF.FriendValue
+        #MF=FileSize(max_size)
+        if upload_file_size>max_size:
+            state=u"上传文件大小超限"
 
     #检测保存路径是否存在,如果不存在则需要创建
     upload_path_format={
@@ -199,7 +200,7 @@ def UploadFile(request):
 
     #返回数据
     return_info = {
-        'url': urllib.basejoin(USettings.gSettings.MEDIA_URL , OutputPathFormat) ,                # 保存后的文件名称
+        'url': urljoin(USettings.gSettings.MEDIA_URL , OutputPathFormat) ,                # 保存后的文件名称
         'original': upload_file_name,                  #原始文件名
         'type': upload_original_ext,
         'state': state,                         #上传状态，成功时返回SUCCESS,其他任何值将原样返回至图片上传框中
@@ -240,7 +241,7 @@ def catcher_remote_image(request):
             o_filename=os.path.join(o_path,o_file).replace("\\","/")
             #读取远程图片文件
             try:
-                remote_image=urllib.urlopen(remote_url)
+                remote_image=urlopen(remote_url)
                  #将抓取到的文件写入文件
                 try:
                     f = open(o_filename, 'wb')
@@ -254,7 +255,7 @@ def catcher_remote_image(request):
 
             catcher_infos.append({
                 "state":state,
-                "url":urllib.basejoin(USettings.gSettings.MEDIA_URL , o_path_format),
+                "url":urljoin(USettings.gSettings.MEDIA_URL , o_path_format),
                 "size":os.path.getsize(o_filename),
                 "title":os.path.basename(o_file),
                 "original":remote_file_name,
