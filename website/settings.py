@@ -90,7 +90,7 @@ MEDIA_ROOT = BASE_DIR + "/App/media"
 
 DOWNLOAD_PATH = BASE_DIR + "/App/static/download/"
 
-
+UPLOAD_PATH = BASE_DIR + "/App/static/upload/"
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
 )

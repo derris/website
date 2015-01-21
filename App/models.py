@@ -52,7 +52,7 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 class User(BaseModel):
-    id = models.AutoField('pk',primary_key=True)
+    id = models.CharField('pk',primary_key=True,max_length=36)
     username = models.CharField('用户',max_length=10)
     pw = models.CharField('密码',max_length=40)
     def __str__(self):
@@ -60,7 +60,7 @@ class User(BaseModel):
     class Meta:
         db_table = 'user'
 class ArticleType(BaseModel):
-    id = models.AutoField('pk',primary_key=True)
+    id = models.CharField('pk',primary_key=True,max_length=36)
     name = models.CharField('类型名称',max_length=50)
     description = models.CharField('描述',max_length=100,blank=True,null=True)
     def __str__(self):
@@ -68,7 +68,7 @@ class ArticleType(BaseModel):
     class Meta:
         db_table = 'ArticleType'
 class Article(BaseModel):
-    id = models.AutoField('pk',primary_key=True)
+    id = models.CharField('pk',primary_key=True,max_length=36)
     articletype = models.ForeignKey('ArticleType', \
         verbose_name='文章类型',related_name='article',db_column='articletype_id', \
         on_delete=DO_NOTHING)
