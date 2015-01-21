@@ -9,6 +9,7 @@ import datetime,random
 from urllib.parse import urljoin
 from urllib.request import urlopen
 
+
 def get_path_format_vars():
     return {
         "year":datetime.datetime.now().strftime("%Y"),
