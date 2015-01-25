@@ -12,10 +12,9 @@
     <script>
         $(function () {
             $('#testid').bind('click', function (event) {
-                var p = { func: 'getArticleList',
+                var p = { func: 'getArticleCont',
                     ex_parm: {
-                        location: { pageCurrent:1, pageRows:10},
-                        columnId : 'C6774368B3B00001BC2E1ADDA21250'
+                        articleId:'1'
                     }
                 };
                 $.ajax({

@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import DO_NOTHING,CASCADE
+from django.db.models import DO_NOTHING,CASCADE,SET_NULL
 import datetime
 # Create your models here.
 
@@ -76,7 +76,7 @@ class Article(BaseModel):
     id = models.CharField('pk',primary_key=True,max_length=32)
     parent = models.ForeignKey('ArticleType', \
         verbose_name='文章类型',related_name='article',db_column='parent_id', \
-        on_delete=DO_NOTHING,blank=True,null=True)
+        on_delete=SET_NULL,blank=True,null=True)
     kind = models.CharField('内部类型名称',max_length=100,blank=True,null=True)
     title = models.CharField('标题',max_length=100)
     content = models.TextField('内容')

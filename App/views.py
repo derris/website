@@ -161,20 +161,23 @@ def getSubArticleType(p_parentId,p_items):
 def getArticleList(p_dict,p_rtn):
     '''
     :param p_dict:{
-        location: { pageCurrent:当前页, pageRows:一页的行数 },
+        location: { pageCurrent:当前页, pageRows:一页的行数,pageTotal:共有多少页 },
         columnId:'xxx'
      }
     :return:
     '''
     if 'columnId' not in p_dict or 'location' not in p_dict:
         raise AppException('上传参数错误')
-    if 'pageCurrent' not in p_dict['location'] or 'pageRows' not in p_dict['location']:
+    if 'pageCurrent' not in p_dict['location'] or 'pageRows' not in p_dict['location'] or 'pageTotal' not in p_dict['location']:
         raise AppException('上传参数错误')
     firstRow = (p_dict['location']['pageCurrent'] - 1) * p_dict['location']['pageRows']
     lastRow = firstRow + p_dict['location']['pageRows']
     articles = list(Article.objects.filter(parent_id=p_dict['columnId'])\
-                   .order_by('rectime').values('id','title','recname','rectime')[firstRow:lastRow])
-    total = Article.objects.filter(parent_id=p_dict['columnId']).count()
+                   .order_by('-rectime').values('id','title','recname','rectime')[firstRow:lastRow])
+    if p_dict['location']['pageTotal'] == 0:
+        total = Article.objects.filter(parent_id=p_dict['columnId']).count()
+    else:
+        total = -1
     p_rtn.update({
         "alertType": 1,
         "error":[],
@@ -185,6 +188,67 @@ def getArticleList(p_dict,p_rtn):
             "contentList" : articles
         }
     })
+def getArticle(p_dict,p_rtn):
+    '''
+    查询指定article
+    :param p_dict: { articleId: xxx }
+    :param p_rtn:
+    :return:
+    '''
+    if 'articleId' not in p_dict:
+        raise AppException('上传参数错误')
+    try:
+        article = Article.objects.get(id=p_dict['articleId'])
+        p_rtn.update({
+            "rtnInfo":"成功",
+            "rtnCode":1,
+            "exObj" : {
+                "article" : {
+                    "id" : article.id,
+                    "parentid" : article.parent_id,
+                    "kind" : article.kind,
+                    "title":article.title,
+                    "content":article.content,
+                    "imglink":article.imglink,
+                    "videolink":article.videolink,
+                    "recname":article.recname,
+                    "rectime":article.rectime
+                }
+            }
+        })
+    except ObjectDoesNotExist:
+        p_rtn.update({
+            "rtnInfo":"失败",
+            "rtnCode":-1
+        })
+def setArticle(p_dict,p_rtn):
+    '''
+    增删改Article
+    :param p_dict:{ article:{
+                        state:"new",
+                        id: 'xxxxx',
+                        parentid:0,
+                        kind:"",
+                        title:"",
+                        content:"",
+                        imglink:"",
+                        videolink:"",
+                        recname:"",
+                        rectime:""
+                    }
+                 }
+        state说明：
+              new：生成insert，
+              dirty：生成update语句。
+              clean：不用
+    :param p_rtn:
+    :return:
+    '''
+    if "article" not in p_dict:
+        raise AppException('上传参数错误')
+    p_article = p_dict['article']
+
+    pass
 def dealPAjax(request):
     l_rtn = {
             "alertType": 0,
@@ -217,6 +281,10 @@ def dealPAjax(request):
                     getArticleType(l_rtn)
                 elif ldict['func'] == 'getArticleList':
                     getArticleList(ldict['ex_parm'],l_rtn)
+                elif ldict['func'] == 'getArticleCont':
+                    getArticle(ldict['ex_parm'],l_rtn)
+                elif ldict['func'] == 'setArticleCont':
+                    setArticle(ldict['ex_parm'],l_rtn)
     except Exception as e:
         log("ajaxResp.dealPAjax执行错误：%s" % str(e.args))
         l_rtn = {
@@ -231,4 +299,13 @@ def dealPAjax(request):
             log(q)
     return ( HttpResponse(json.dumps(l_rtn, ensure_ascii=False)))
 def ueditorController(request):
+    if ('username' not in request.session or request.session['username'] == None):
+        return HttpResponse(json.dumps({
+            "rtnCode":0,
+            "rtnInfo":"登录不成功",
+            "alertType":0,
+            "error":[],
+            "exObj":{},
+            "appendOper": "login"
+        },ensure_ascii=False), content_type="application/javascript")
     return get_ueditor_controller(request)
