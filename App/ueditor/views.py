@@ -9,7 +9,7 @@ import datetime,random
 from urllib.parse import urljoin
 from urllib.request import urlopen
 
-
+@csrf_exempt
 def get_path_format_vars():
     return {
         "year":datetime.datetime.now().strftime("%Y"),
@@ -21,6 +21,7 @@ def get_path_format_vars():
     }
 
 #保存上传的文件
+@csrf_exempt
 def save_upload_file(PostFile,FilePath):
     try:
         f = open(FilePath, 'wb')
@@ -98,7 +99,7 @@ def list_files(request):
 
     return HttpResponse(json.dumps(return_info),content_type="application/javascript")
 
-
+@csrf_exempt
 def get_files(root_path,cur_path, allow_types=[]):
     files = []
     items = os.listdir(cur_path)
@@ -270,7 +271,7 @@ def catcher_remote_image(request):
 
     return HttpResponse(json.dumps(return_info,ensure_ascii=False),content_type="application/javascript")
 
-
+@csrf_exempt
 def get_output_path(request,path_format,path_format_var):
     #取得输出文件的路径
     OutputPathFormat=(request.GET.get(path_format,USettings.UEditorSettings["defaultPathFormat"]) % path_format_var).replace("\\","/")

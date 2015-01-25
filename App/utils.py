@@ -6,6 +6,7 @@ from website.settings import BASE_DIR, DEBUG
 import sys
 import json
 from decimal import Decimal
+
 class ServerToClientJsonEncoder(json.JSONEncoder):
     def default(self,obj):
         if isinstance(obj,datetime):
@@ -16,6 +17,8 @@ class ServerToClientJsonEncoder(json.JSONEncoder):
             return float(obj)
         else:
             return json.JSONEncoder.default(self,obj)
+class AppException(Exception):
+    pass
 
 def log(aMsg, alogFile = BASE_DIR + 'djgw.log'):
     '''

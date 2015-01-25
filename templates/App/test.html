@@ -4,22 +4,37 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     {% load static from staticfiles %}
     <title></title>
-   {% comment %}
-   <link rel="stylesheet" type="text/css" href="{% static "js/ueditor/themes/default/css/ueditor.min.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "js/ueditor/themes/default/css/ueditor.min.css" %}">
     <script type="text/javascript" src="{% static "js/ueditor/ueditor.config.js" %}"></script>
     <script type="text/javascript" src="{% static "js/ueditor/ueditor.all.min.js" %}"></script>
-    {% endcomment %}
-   <link rel="stylesheet" type="text/css" href="{% static "js/ueditor/themes/default/css/ueditor.min.css" %}">
-    <script type="text/javascript" src="{% static "js/ueditor/ueditor.config.js" %}"></script>
-    <script type="text/javascript" src="{% static "js/ueditor/ueditor.all.min.js" %}"></script>
-
+    <script type="text/javascript" src="{% static "js/jquery.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/App.js" %}"></script>
+    <script>
+        $(function () {
+            $('#testid').bind('click', function (event) {
+                var p = { func: 'getArticleList',
+                    ex_parm: {
+                        location: { pageCurrent:1, pageRows:10},
+                        columnId : 'C6774368B3B00001BC2E1ADDA21250'
+                    }
+                };
+                $.ajax({
+                    url: {% url 'ajax' %},
+                    data: {jpargs: JSON.stringify(p)}
+                });
+            });
+        });
+    </script>
 </head>
 <body>
 {% csrf_token %}
 <textarea id="content" name="content" style="width:575px;line-height:18px;"></textarea>
 <script>
-    var ue=new UE.ui.Editor();
+    var ue = new UE.ui.Editor();
     ue.render('content');
 </script>
+
+<button id="testid">testbutton</button>
+
 </body>
 </html>

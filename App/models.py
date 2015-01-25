@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import DO_NOTHING
+from django.db.models import DO_NOTHING,CASCADE
 import datetime
 # Create your models here.
 
@@ -7,7 +7,8 @@ BoolCharacter=(('Y','是'),('N','否'))
 
 class BaseModel(models.Model):
     ''''''
-    rec_name = models.IntegerField('创建人员')
+    recname = models.CharField('创建人员',max_length=32,blank=True,null=True)
+    rectime = models.CharField('创建时间',max_length=19,blank=True,null=True)
     remark = models.CharField('备注',blank=True,max_length=50,null=True)
     def __getitem__(self,k):
         return self.__getattribute__(k)
@@ -52,34 +53,35 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 class User(BaseModel):
-    id = models.CharField('pk',primary_key=True,max_length=36)
-    username = models.CharField('用户',max_length=10)
+    id = models.CharField('pk',primary_key=True,max_length=32)
+    username = models.CharField('用户',max_length=10,unique=True)
     pw = models.CharField('密码',max_length=40)
     def __str__(self):
         return self.username
     class Meta:
-        db_table = 'user'
+        db_table = 'User'
 class ArticleType(BaseModel):
     id = models.CharField('pk',primary_key=True,max_length=32)
     parent = models.ForeignKey('ArticleType',verbose_name='父类型', \
-                               related_name='subarticletype',db_column='parent_id',on_delete=DO_NOTHING)
+                               related_name='subarticletype',db_column='parent_id',on_delete=CASCADE,
+                               blank=True,null=True)
     kind = models.CharField('内部类型名称',max_length=100,blank=True,null=True)
     title = models.CharField('标题',max_length=100,blank=True,null=True)
+    link = models.CharField('链接',max_length=100,blank=True,null=True)
     def __str__(self):
-        return self.name
+        return self.title
     class Meta:
         db_table = 'ArticleType'
 class Article(BaseModel):
     id = models.CharField('pk',primary_key=True,max_length=32)
     parent = models.ForeignKey('ArticleType', \
         verbose_name='文章类型',related_name='article',db_column='parent_id', \
-        on_delete=DO_NOTHING)
+        on_delete=DO_NOTHING,blank=True,null=True)
     kind = models.CharField('内部类型名称',max_length=100,blank=True,null=True)
     title = models.CharField('标题',max_length=100)
     content = models.TextField('内容')
     imglink = models.CharField('标题图片链接',max_length=100,blank=True,null=True)
     videolink = models.CharField('视频链接',max_length=100,blank=True,null=True)
-    publishdate = models.DateTimeField('发布时间')
     def __str__(self):
         return self.title
     class Meta:

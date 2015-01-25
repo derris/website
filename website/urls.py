@@ -10,4 +10,5 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^App/1/', views.test1,name='test1'),
     url(r'^notstatic/js/ueditor/controller', get_ueditor_controller,name='ueditor'),
+    url(r'^ajax/',views.dealPAjax,name='ajax'),
 )
