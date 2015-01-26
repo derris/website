@@ -2,7 +2,7 @@
 from django.db import connection,transaction
 from django.shortcuts import render,HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
-from django.views.decorators.csrf import csrf_exempt
+#from django.views.decorators.csrf import csrf_exempt
 import json
 from App.utils import log,AppException
 from App.models import *
@@ -246,9 +246,38 @@ def setArticle(p_dict,p_rtn):
     '''
     if "article" not in p_dict:
         raise AppException('上传参数错误')
-    p_article = p_dict['article']
-
-    pass
+    p_article = p_dict['article'].copy()
+    if 'state' not in p_article:
+        raise AppException('上传参数错误')
+    p_article.update({
+        'parent_id':p_article['parentid']
+    })
+    del p_article['parentid']
+    state = p_article['state']
+    del p_article['state']
+    if state == 'new':
+        new_article = Article(**p_article)
+        new_article.save()
+    elif state == 'dirty':
+        id = p_article['id']
+        del p_article['id']
+        Article.objects.filter(id=id).update(**p_article)
+    elif state == 'clean':
+        pass
+    else:
+        raise AppException('上传参数错误')
+    p_rtn.update({
+        "rtnInfo": "成功",
+        "rtnCode": 1,
+    })
+def deleteArticle(p_dict,p_rtn):
+    if 'articleId' not in p_dict:
+        raise AppException('上传参数错误')
+    Article.objects.filter(id=p_dict['articleId']).delete()
+    p_rtn.update({
+        "rtnInfo": "成功",
+        "rtnCode": 1,
+    })
 def dealPAjax(request):
     l_rtn = {
             "alertType": 0,
@@ -285,6 +314,8 @@ def dealPAjax(request):
                     getArticle(ldict['ex_parm'],l_rtn)
                 elif ldict['func'] == 'setArticleCont':
                     setArticle(ldict['ex_parm'],l_rtn)
+                elif ldict['func'] == 'deleteArticleCont':
+                    deleteArticle(ldict['ex_parm'],l_rtn)
     except Exception as e:
         log("ajaxResp.dealPAjax执行错误：%s" % str(e.args))
         l_rtn = {
